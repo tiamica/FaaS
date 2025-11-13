@@ -21,5 +21,5 @@ The most intelligent search engine for Africa, focusing on positive business ins
 
 1. **Clone or create the project structure**
    ```bash
-   mkdir africa-search-engine
-   cd africa-search-engine
+   git clone https://github.com/tiamica/FaaS.git
+   cd FaaS
