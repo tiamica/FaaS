@@ -6,7 +6,9 @@ export const africanCountries = [
         gdp: "$1.1 trillion (PPP)",
         keySectors: ["Technology", "Energy", "Agriculture", "Creative Industries"],
         positiveAffirmation: "Africa's largest economy and tech hub, driving innovation across the continent with a vibrant youth population and entrepreneurial spirit.",
-        flag: "🇳🇬"
+        flag: "🇳🇬",
+        rulingParty: "All Progressives Congress (APC)",
+        leader: "Bola Tinubu (President)"
     },
     {
         name: "South Africa",
@@ -15,7 +17,9 @@ export const africanCountries = [
         gdp: "$861 billion (PPP)",
         keySectors: ["Mining", "Finance", "Manufacturing", "Tourism"],
         positiveAffirmation: "A diversified economy and financial powerhouse, leading in infrastructure development and renewable energy initiatives.",
-        flag: "🇿🇦"
+        flag: "🇿🇦",
+        rulingParty: "African National Congress (ANC)",
+        leader: "Cyril Ramaphosa (President)"
     },
     {
         name: "Kenya",
@@ -24,7 +28,9 @@ export const africanCountries = [
         gdp: "$338 billion (PPP)",
         keySectors: ["Technology", "Agriculture", "Tourism", "Finance"],
         positiveAffirmation: "The Silicon Savannah of Africa, pioneering mobile technology and innovation with a thriving startup ecosystem.",
-        flag: "🇰🇪"
+        flag: "🇰🇪",
+        rulingParty: "United Democratic Alliance (UDA)",
+        leader: "William Ruto (President)"
     },
     {
         name: "Egypt",
@@ -33,7 +39,9 @@ export const africanCountries = [
         gdp: "$1.4 trillion (PPP)",
         keySectors: ["Tourism", "Manufacturing", "ICT", "Energy"],
         positiveAffirmation: "A bridge between continents with ancient wisdom and modern ambition, leading in renewable energy and digital transformation.",
-        flag: "🇪🇬"
+        flag: "🇪🇬",
+        rulingParty: "Nation's Future Party",
+        leader: "Abdel Fattah el-Sisi (President)"
     },
     {
         name: "Ghana",
@@ -42,7 +50,9 @@ export const africanCountries = [
         gdp: "$227 billion (PPP)",
         keySectors: ["Gold", "Cocoa", "Oil & Gas", "Services"],
         positiveAffirmation: "A beacon of stability and democracy in West Africa, with rapid economic growth and innovation in fintech.",
-        flag: "🇬🇭"
+        flag: "🇬🇭",
+        rulingParty: "New Patriotic Party (NPP)",
+        leader: "Nana Akufo-Addo (President)"
     },
     {
         name: "Ethiopia",
@@ -51,7 +61,9 @@ export const africanCountries = [
         gdp: "$336 billion (PPP)",
         keySectors: ["Agriculture", "Manufacturing", "Infrastructure", "Airlines"],
         positiveAffirmation: "The African lion awakening with massive infrastructure development and becoming a manufacturing hub for East Africa.",
-        flag: "🇪🇹"
+        flag: "🇪🇹",
+        rulingParty: "Prosperity Party",
+        leader: "Abiy Ahmed (Prime Minister)"
     },
     {
         name: "Rwanda",
@@ -60,7 +72,9 @@ export const africanCountries = [
         gdp: "$112 billion (PPP)",
         keySectors: ["Technology", "Tourism", "Services", "Manufacturing"],
         positiveAffirmation: "The Singapore of Africa, showcasing remarkable transformation with world-class governance and tech innovation.",
-        flag: "🇷🇼"
+        flag: "🇷🇼",
+        rulingParty: "Rwandan Patriotic Front (RPF)",
+        leader: "Paul Kagame (President)"
     },
     {
         name: "Morocco",
@@ -69,7 +83,9 @@ export const africanCountries = [
         gdp: "$333 billion (PPP)",
         keySectors: ["Agriculture", "Automotive", "Renewable Energy", "Tourism"],
         positiveAffirmation: "A gateway to Africa with advanced infrastructure and leadership in renewable energy and automotive manufacturing.",
-        flag: "🇲🇦"
+        flag: "🇲🇦",
+        rulingParty: "National Rally of Independents (RNI)",
+        leader: "Aziz Akhannouch (Prime Minister)"
     },
     {
         name: "Tanzania",
@@ -78,7 +94,9 @@ export const africanCountries = [
         gdp: "$193 billion (PPP)",
         keySectors: ["Mining", "Tourism", "Agriculture", "Natural Gas"],
         positiveAffirmation: "Rich in natural resources and cultural heritage, emerging as an economic powerhouse in East Africa.",
-        flag: "🇹🇿"
+        flag: "🇹🇿",
+        rulingParty: "Chama Cha Mapinduzi (CCM)",
+        leader: "Samia Suluhu Hassan (President)"
     },
     {
         name: "Ivory Coast",
@@ -87,7 +105,9 @@ export const africanCountries = [
         gdp: "$173 billion (PPP)",
         keySectors: ["Cocoa", "Agriculture", "Services", "Infrastructure"],
         positiveAffirmation: "West Africa's rising star with robust economic growth and leadership in agricultural innovation.",
-        flag: "🇨🇮"
+        flag: "🇨🇮",
+        rulingParty: "Rally of Houphouëtists for Democracy and Peace (RHDP)",
+        leader: "Alassane Ouattara (President)"
     },
     {
         name: "Algeria",

@@ -14,6 +14,11 @@ class FourierAnalyticsAISearch {
     init() {
         const appElement = document.getElementById('app');
         
+        if (!appElement) {
+            console.error('App element not found. Make sure there is an element with id="app" in the HTML.');
+            return;
+        }
+        
         // Create main structure
         appElement.innerHTML = `
             <div class="main-header"></div>
@@ -24,6 +29,11 @@ class FourierAnalyticsAISearch {
         const headerElement = appElement.querySelector('.main-header');
         const mainElement = appElement.querySelector('.main-content');
         
+        if (!headerElement || !mainElement) {
+            console.error('Failed to create main structure elements');
+            return;
+        }
+        
         headerElement.appendChild(this.searchBar.element);
         mainElement.appendChild(this.searchResults.element);
 
@@ -32,30 +42,10 @@ class FourierAnalyticsAISearch {
     }
 
     async showWelcomeMessage() {
-        // Show welcome message initially
-        const resultsContainer = document.querySelector('.results-container');
-        if (resultsContainer) {
-            resultsContainer.innerHTML = `
-                <div style="text-align: center; padding: 3rem 1rem; color: var(--text-dark);">
-                    <h2 style="font-size: 2rem; margin-bottom: 1rem; font-weight: 600; color: var(--text-dark);">Welcome to Fourier Analytics AI Search</h2>
-                    <p style="font-size: 1.1rem; color: var(--text-light); margin-bottom: 0.5rem;">The most intelligent search engine for Africa</p>
-                    <p style="margin-top: 1rem; font-size: 0.95rem; color: var(--text-muted);">
-                        Search for business opportunities, investments, and information about Africa
-                    </p>
-                </div>
-            `;
-        }
-
-        // Load initial results after a short delay
-        setTimeout(async () => {
-            const welcomeQuery = "business opportunities in Africa";
-            try {
-                const results = await AIService.generateResponse(welcomeQuery);
-                this.searchResults.displayResults(results);
-            } catch (error) {
-                console.error('Welcome message error:', error);
-            }
-        }, 1500);
+        // Show welcome message initially using SearchResults method
+        this.searchResults.showWelcomeMessage();
+        // Clear AI response to show blank/pending state
+        this.searchResults.clearAIResponse();
     }
 
     async handleSearch(query) {

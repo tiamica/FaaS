@@ -21,6 +21,19 @@ export class Config {
         return !!(this.getGoogleApiKey() && this.getGoogleSearchEngineId());
     }
 
+    // Bing Search API Configuration
+    static getBingApiKey() {
+        return localStorage.getItem('bing_api_key') || import.meta.env.VITE_BING_API_KEY;
+    }
+
+    static setBingApiKey(apiKey) {
+        localStorage.setItem('bing_api_key', apiKey);
+    }
+
+    static isBingSearchEnabled() {
+        return !!this.getBingApiKey();
+    }
+
     // Legacy DeepSeek API Configuration (kept for backward compatibility)
     static getApiKey() {
         return localStorage.getItem('deepseek_api_key');

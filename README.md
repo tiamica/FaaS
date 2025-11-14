@@ -6,10 +6,13 @@ FaaS is an AI-powered search engine that focuses on providing positive, high-val
 
 ## Features
 
-- **Google Search Integration**: Real-time search results from Google Custom Search API
+- **Multi-Search Engine Integration**: Aggregates results from Google, Bing, and DuckDuckGo for comprehensive coverage
+- **Deep Thinking AI**: Advanced multi-step reasoning similar to DeepSeek, Gemini, and ChatGPT, but Africa-focused
+- **Intelligent Query Processing**: Breaks down queries into sub-queries for thorough analysis
 - **AI-Powered Narratives**: Intelligent responses about African business and opportunities
 - **Country-Specific Insights**: Detailed information about African nations with positive affirmations
 - **Africa-Focused Content**: All results are tailored to highlight positive business opportunities in Africa
+- **Clickable Links**: Related links in AI responses and country cards for easy exploration
 - **Clean Interface**: Modern, responsive design with excellent UX
 - **Smart Country Matching**: Automatically identifies which African countries are most relevant to search queries
 
@@ -29,9 +32,11 @@ FaaS is an AI-powered search engine that focuses on providing positive, high-val
 npm install
 ```
 
-### 2. Configure Google Custom Search API
+### 2. Configure Search Engines (Optional but Recommended)
 
-To enable Google Search functionality, you need to set up Google Custom Search API:
+The application supports multiple search engines for comprehensive results. You can configure one or more:
+
+#### Google Custom Search API
 
 1. **Get Google API Key**:
    - Go to [Google Cloud Console](https://console.cloud.google.com/)
@@ -65,6 +70,29 @@ To enable Google Search functionality, you need to set up Google Custom Search A
    localStorage.setItem('google_search_engine_id', 'your_search_engine_id_here');
    ```
 
+#### Bing Search API (Optional)
+
+For even more comprehensive results, you can also configure Bing Search:
+
+1. **Get Bing API Key**:
+   - Go to [Azure Portal](https://portal.azure.com/)
+   - Create a new "Bing Search v7" resource
+   - Copy your API key
+
+2. **Configure in Application**:
+   
+   **Option A: Environment Variables**
+   ```env
+   VITE_BING_API_KEY=your_bing_api_key_here
+   ```
+   
+   **Option B: Browser Console**
+   ```javascript
+   localStorage.setItem('bing_api_key', 'your_bing_api_key_here');
+   ```
+
+**Note**: DuckDuckGo search works automatically without any API key configuration.
+
 ### 3. Run the Application
 
 **Development Mode:**
@@ -86,16 +114,26 @@ npm run preview
 
 ## How It Works
 
-1. **User enters a search query** in the search bar
-2. **Query is enhanced** with Africa-focused terms if not already present
-3. **Google Search API** is called (if configured) to get real-time results
-4. **AI Service processes results** to identify relevant African countries
-5. **Narrative is generated** highlighting positive business opportunities
-6. **Results are displayed** with:
+### Deep Thinking Process
+
+The application uses a sophisticated multi-step reasoning approach:
+
+1. **Query Understanding**: Analyzes the query to understand intent, type, and key entities
+2. **Africa Relevance Analysis**: Identifies relevant African countries and sectors
+3. **Sub-Query Generation**: Creates multiple related queries for comprehensive coverage
+4. **Multi-Engine Search**: Searches across Google, Bing, and DuckDuckGo simultaneously
+5. **Result Aggregation**: Combines and deduplicates results from all engines
+6. **Deep Analysis**: Extracts insights, trends, and patterns from aggregated results
+7. **Narrative Generation**: Synthesizes findings into comprehensive Africa-focused narratives
+
+### Result Display
+
+Results are displayed with:
    - AI-generated narrative about the topic
    - Related African countries with detailed information
+   - Clickable links in both the AI response and country cards
    - Positive affirmations for each country
-   - Source links from Google Search results
+   - Source links from multiple search engines
 
 ## Fallback Mode
 

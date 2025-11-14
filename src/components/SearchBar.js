@@ -44,6 +44,11 @@ export class SearchBar {
         const searchInput = this.element.querySelector('#searchInput');
         const searchButton = this.element.querySelector('#searchButton');
 
+        if (!searchInput || !searchButton) {
+            console.error('Search input or button not found');
+            return;
+        }
+
         // Search on button click
         searchButton.addEventListener('click', () => {
             this.performSearch();
@@ -79,6 +84,11 @@ export class SearchBar {
         this.isLoading = loading;
         const searchButton = this.element.querySelector('#searchButton');
         const searchInput = this.element.querySelector('#searchInput');
+        
+        if (!searchButton || !searchInput) {
+            console.error('Search button or input not found');
+            return;
+        }
         
         if (loading) {
             searchButton.disabled = true;

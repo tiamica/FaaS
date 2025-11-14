@@ -1,35 +1,100 @@
 import axios from 'axios';
 import { africanCountries, africanKeywords } from '../data/africanCountries.js';
 import Config from '../utils/config.js';
+import deepThinkingService from './deepThinkingService.js';
+import multiSearchService from './multiSearchService.js';
 
 class AIService {
     constructor() {
         this.googleSearchEnabled = false;
+        this.useDeepThinking = true; // Enable deep thinking by default
     }
 
     /**
-     * Main method to generate response with Google Search integration
+     * Main method to generate response with Deep Thinking and Multi-Search integration
      */
     async generateResponse(query) {
         try {
-            // Try to use Google Search if configured
-            if (Config.isGoogleSearchEnabled()) {
+            // Use deep thinking approach for comprehensive results
+            if (this.useDeepThinking) {
                 try {
-                    const googleResults = await this.performGoogleSearch(query);
-                    return this.processGoogleResults(query, googleResults);
+                    const deepThinkingResult = await deepThinkingService.thinkDeeply(query);
+                    return this.processDeepThinkingResults(deepThinkingResult);
                 } catch (error) {
-                    console.warn('Google Search failed, using enhanced fallback:', error.message);
-                    // Fallback to enhanced simulated response
-                    return await this.generateEnhancedResponse(query);
+                    console.warn('Deep thinking failed, falling back to standard search:', error.message);
+                    // Fallback to standard multi-search
+                    return await this.generateMultiSearchResponse(query);
                 }
             }
             
-            // Fallback to enhanced simulated response
-            return await this.generateEnhancedResponse(query);
+            // Standard multi-search approach
+            return await this.generateMultiSearchResponse(query);
         } catch (error) {
             console.error('Search error:', error);
-            // Fallback to simulated response on error
+            // Final fallback to enhanced simulated response
             return await this.generateEnhancedResponse(query);
+        }
+    }
+
+    /**
+     * Process deep thinking results into display format
+     */
+    processDeepThinkingResults(deepThinkingResult) {
+        const { narrative, analysis, searchResults } = deepThinkingResult;
+        
+        // Extract sources from ranked items with engine info
+        const sources = (searchResults.rankedItems || []).slice(0, 10).map(item => ({
+            title: item.title || 'Untitled',
+            url: item.url || '#',
+            description: item.description || '',
+            engine: item.engine || 'unknown'
+        }));
+
+        return {
+            answer: narrative,
+            relatedCountries: analysis.countriesWithLinks || [],
+            sources: sources,
+            searchResults: searchResults.rankedItems || [],
+            reasoningSteps: deepThinkingResult.reasoningSteps // For debugging/insights
+        };
+    }
+
+    /**
+     * Generate response using multi-search (without deep thinking)
+     */
+    async generateMultiSearchResponse(query) {
+        try {
+            // Search across all engines
+            const searchResults = await multiSearchService.searchAll(query);
+            
+            // Deduplicate and rank
+            const unique = multiSearchService.deduplicateResults(searchResults.allItems);
+            const ranked = multiSearchService.rankResults(unique, query);
+            
+            // Process results
+            const relatedCountries = this.findRelatedCountriesFromResults(query, ranked);
+            const narrative = this.generateCountryNarrative(query, ranked, relatedCountries);
+            
+            // Match sources to countries
+            const countriesWithLinks = this.matchSourcesToCountries(relatedCountries, ranked);
+            
+            // Extract sources with engine info
+            const sources = ranked.slice(0, 10).map(item => ({
+                title: item.title || 'Untitled',
+                url: item.url || '#',
+                description: item.description || '',
+                engine: item.engine || 'unknown'
+            }));
+
+            return {
+                answer: narrative,
+                relatedCountries: countriesWithLinks,
+                sources: sources,
+                searchResults: ranked
+            };
+        } catch (error) {
+            console.error('Multi-search failed:', error);
+            throw error;
         }
     }
 
@@ -142,12 +207,43 @@ class AIService {
             description: item.snippet || item.htmlSnippet || ''
         }));
 
+        // Match sources to countries
+        const countriesWithLinks = this.matchSourcesToCountries(relatedCountries, items);
+
         return {
             answer: narrative,
-            relatedCountries: relatedCountries,
+            relatedCountries: countriesWithLinks,
             sources: sources,
             searchResults: items
         };
+    }
+
+    /**
+     * Match sources to countries based on country mentions in search results
+     */
+    matchSourcesToCountries(countries, items) {
+        return countries.map(country => {
+            const countryNameLower = country.name.toLowerCase();
+            const countryLinks = [];
+            
+            // Find items that mention this country
+            items.forEach(item => {
+                const text = `${item.title || ''} ${item.snippet || ''}`.toLowerCase();
+                if (text.includes(countryNameLower)) {
+                    countryLinks.push({
+                        title: item.title || 'Untitled',
+                        url: item.link || '#',
+                        description: item.snippet || item.htmlSnippet || ''
+                    });
+                }
+            });
+            
+            // Limit to top 3 links per country
+            return {
+                ...country,
+                links: countryLinks.slice(0, 3)
+            };
+        });
     }
 
     /**
@@ -287,10 +383,17 @@ class AIService {
         
         const narrative = this.createPositiveNarrative(query, relatedCountries);
         
+        // Add links to countries from general sources
+        const sources = this.findRelevantSources(lowerQuery);
+        const countriesWithLinks = relatedCountries.map(country => ({
+            ...country,
+            links: sources.slice(0, 2) // Add 2 general links to each country
+        }));
+        
         return {
             answer: narrative,
-            relatedCountries: relatedCountries,
-            sources: this.findRelevantSources(lowerQuery)
+            relatedCountries: countriesWithLinks,
+            sources: sources
         };
     }
 
