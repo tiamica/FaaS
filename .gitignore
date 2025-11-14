@@ -14,7 +14,7 @@ build/
 .env.development
 
 # API Keys Configuration (contains sensitive keys)
-src/config/apiKeys.js
+#src/config/apiKeys.js
 
 # IDE
 .vscode/
