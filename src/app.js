@@ -60,7 +60,16 @@ class FourierAnalyticsAISearch {
         this.searchResults.showLoading();
 
         try {
-            const results = await AIService.generateResponse(query.trim());
+            const trimmedQuery = query.trim();
+            console.log('Searching for:', trimmedQuery);
+            
+            const results = await AIService.generateResponse(trimmedQuery);
+            
+            console.log('Search results received:', {
+                hasAnswer: !!results?.answer,
+                countriesCount: results?.relatedCountries?.length || 0,
+                sourcesCount: results?.sources?.length || 0
+            });
             
             // Ensure results have required structure
             if (!results || !results.answer) {

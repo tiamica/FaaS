@@ -43,18 +43,25 @@ class AIService {
         const { narrative, analysis, searchResults } = deepThinkingResult;
         
         // Extract sources from ranked items with engine info
-        const sources = (searchResults.rankedItems || []).slice(0, 10).map(item => ({
+        const rankedItems = searchResults.rankedItems || [];
+        const sources = rankedItems.slice(0, 10).map(item => ({
             title: item.title || 'Untitled',
             url: item.url || '#',
             description: item.description || '',
             engine: item.engine || 'unknown'
         }));
 
+        // If no search results, fall back to enhanced response
+        if (rankedItems.length === 0) {
+            console.warn('No search results from deep thinking, using enhanced fallback');
+            return this.generateEnhancedResponse(deepThinkingResult.query);
+        }
+
         return {
             answer: narrative,
             relatedCountries: analysis.countriesWithLinks || [],
             sources: sources,
-            searchResults: searchResults.rankedItems || [],
+            searchResults: rankedItems,
             reasoningSteps: deepThinkingResult.reasoningSteps // For debugging/insights
         };
     }
@@ -66,6 +73,12 @@ class AIService {
         try {
             // Search across all engines
             const searchResults = await multiSearchService.searchAll(query);
+            
+            // If no results, fall back to enhanced response
+            if (!searchResults.allItems || searchResults.allItems.length === 0) {
+                console.warn('No search results from multi-search, using enhanced fallback');
+                return await this.generateEnhancedResponse(query);
+            }
             
             // Deduplicate and rank
             const unique = multiSearchService.deduplicateResults(searchResults.allItems);
@@ -94,7 +107,8 @@ class AIService {
             };
         } catch (error) {
             console.error('Multi-search failed:', error);
-            throw error;
+            // Fall back to enhanced response instead of throwing
+            return await this.generateEnhancedResponse(query);
         }
     }
 
@@ -372,7 +386,7 @@ class AIService {
     }
 
     /**
-     * Enhanced simulated response (fallback when Google Search is not available)
+     * Enhanced simulated response (fallback when search engines are not available or return no results)
      */
     async generateEnhancedResponse(query) {
         // Simulate API delay
@@ -381,19 +395,36 @@ class AIService {
         const lowerQuery = query.toLowerCase();
         const relatedCountries = this.findRelatedCountries(lowerQuery);
         
-        const narrative = this.createPositiveNarrative(query, relatedCountries);
+        // Check if search engines are configured
+        const hasGoogle = Config.isGoogleSearchEnabled();
+        const hasBing = Config.isBingSearchEnabled();
+        const hasSearchEngines = hasGoogle || hasBing;
+        
+        let narrative = this.createPositiveNarrative(query, relatedCountries);
+        
+        // Add note about search engine configuration if needed
+        if (!hasSearchEngines) {
+            narrative += ` Note: For real-time search results, please configure Google Custom Search API or Bing Search API. `;
+            narrative += `You can set API keys in the browser console or via environment variables. `;
+        }
         
         // Add links to countries from general sources
         const sources = this.findRelevantSources(lowerQuery);
         const countriesWithLinks = relatedCountries.map(country => ({
             ...country,
-            links: sources.slice(0, 2) // Add 2 general links to each country
+            links: sources.slice(0, 2).map(source => ({
+                ...source,
+                engine: 'general' // Mark as general/fallback sources
+            })) // Add 2 general links to each country
         }));
         
         return {
             answer: narrative,
             relatedCountries: countriesWithLinks,
-            sources: sources
+            sources: sources.map(source => ({
+                ...source,
+                engine: 'general'
+            }))
         };
     }
 

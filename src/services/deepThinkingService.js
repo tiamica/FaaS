@@ -198,21 +198,27 @@ class DeepThinkingService {
             byEngine: {}
         };
 
-        // Search each sub-query across all engines
-        for (const subQuery of subQueries) {
+        // Search each sub-query across all engines (limit to first 3 sub-queries to avoid too many requests)
+        const queriesToSearch = subQueries.slice(0, 3);
+        
+        for (const subQuery of queriesToSearch) {
             try {
                 const results = await multiSearchService.searchAll(subQuery);
                 allResults.byQuery[subQuery] = results;
                 
                 // Aggregate items
-                allResults.allItems.push(...results.allItems);
+                if (results.allItems && results.allItems.length > 0) {
+                    allResults.allItems.push(...results.allItems);
+                }
                 
                 // Aggregate by engine
-                Object.entries(results.byEngine).forEach(([engine, items]) => {
+                Object.entries(results.byEngine || {}).forEach(([engine, items]) => {
                     if (!allResults.byEngine[engine]) {
                         allResults.byEngine[engine] = [];
                     }
-                    allResults.byEngine[engine].push(...items);
+                    if (items && items.length > 0) {
+                        allResults.byEngine[engine].push(...items);
+                    }
                 });
             } catch (error) {
                 console.warn(`Search failed for query "${subQuery}":`, error.message);
@@ -220,8 +226,12 @@ class DeepThinkingService {
         }
 
         // Deduplicate and rank
-        const unique = multiSearchService.deduplicateResults(allResults.allItems);
-        const ranked = multiSearchService.rankResults(unique, subQueries[0]); // Rank by original query
+        const unique = allResults.allItems.length > 0 
+            ? multiSearchService.deduplicateResults(allResults.allItems)
+            : [];
+        const ranked = unique.length > 0
+            ? multiSearchService.rankResults(unique, subQueries[0]) // Rank by original query
+            : [];
 
         return {
             ...allResults,
@@ -237,7 +247,7 @@ class DeepThinkingService {
         const rankedItems = searchResults.rankedItems || [];
         
         // Extract key insights
-        const insights = this.extractInsights(rankedItems);
+        const insights = rankedItems.length > 0 ? this.extractInsights(rankedItems) : [];
         
         // Match countries to results
         const countriesWithLinks = this.matchCountriesToResults(
@@ -246,12 +256,12 @@ class DeepThinkingService {
         );
 
         // Identify trends and patterns
-        const trends = this.identifyTrends(rankedItems);
+        const trends = rankedItems.length > 0 ? this.identifyTrends(rankedItems) : [];
 
         return {
             totalResults: rankedItems.length,
             insights,
-            countriesWithLinks,
+            countriesWithLinks: countriesWithLinks.length > 0 ? countriesWithLinks : africaRelevance.relevantCountries,
             trends,
             topSources: rankedItems.slice(0, 10)
         };
@@ -264,24 +274,36 @@ class DeepThinkingService {
         let narrative = `Based on comprehensive analysis of "${query}", `;
         
         // Add country context
-        if (analysis.countriesWithLinks.length > 0) {
+        if (analysis.countriesWithLinks && analysis.countriesWithLinks.length > 0) {
             const countryNames = analysis.countriesWithLinks.map(c => c.name);
+            narrative += `this topic is particularly relevant to ${this.formatCountryList(countryNames)}. `;
+        } else if (africaRelevance.relevantCountries && africaRelevance.relevantCountries.length > 0) {
+            const countryNames = africaRelevance.relevantCountries.map(c => c.name);
             narrative += `this topic is particularly relevant to ${this.formatCountryList(countryNames)}. `;
         }
 
-        // Add insights
-        if (analysis.insights.length > 0) {
-            narrative += `Key insights reveal: ${analysis.insights.slice(0, 3).join(' ')} `;
+        // Add insights if available
+        if (analysis.insights && analysis.insights.length > 0) {
+            const insightsText = analysis.insights.slice(0, 3).join('. ').substring(0, 200);
+            if (insightsText) {
+                narrative += `Key insights reveal: ${insightsText}. `;
+            }
         }
 
         // Add country-specific information
-        analysis.countriesWithLinks.slice(0, 3).forEach(country => {
-            narrative += `${country.name} ${country.positiveAffirmation} `;
+        const countriesToShow = (analysis.countriesWithLinks || africaRelevance.relevantCountries || []).slice(0, 3);
+        countriesToShow.forEach(country => {
+            if (country && country.positiveAffirmation) {
+                narrative += `${country.name} ${country.positiveAffirmation} `;
+            }
         });
 
-        // Add trends
-        if (analysis.trends.length > 0) {
-            narrative += `Current trends indicate: ${analysis.trends.slice(0, 2).join(' ')} `;
+        // Add trends if available
+        if (analysis.trends && analysis.trends.length > 0) {
+            const trendsText = analysis.trends.slice(0, 2).join(', ');
+            if (trendsText) {
+                narrative += `Current trends indicate: ${trendsText}. `;
+            }
         }
 
         // Add positive Africa-focused conclusion

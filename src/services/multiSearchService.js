@@ -12,6 +12,8 @@ class MultiSearchService {
     }
 
     initializeEngines() {
+        this.searchEngines = [];
+        
         // Google Custom Search
         if (Config.isGoogleSearchEnabled()) {
             this.searchEngines.push({
@@ -21,19 +23,22 @@ class MultiSearchService {
             });
         }
 
-        // DuckDuckGo (no API key needed, but limited)
-        this.searchEngines.push({
-            name: 'duckduckgo',
-            enabled: true,
-            search: this.performDuckDuckGoSearch.bind(this)
-        });
-
         // Bing Search (if API key is configured)
         if (Config.getBingApiKey()) {
             this.searchEngines.push({
                 name: 'bing',
                 enabled: true,
                 search: this.performBingSearch.bind(this)
+            });
+        }
+
+        // DuckDuckGo (no API key needed, but very limited - only instant answers)
+        // Only add if no other engines are configured
+        if (this.searchEngines.length === 0) {
+            this.searchEngines.push({
+                name: 'duckduckgo',
+                enabled: true,
+                search: this.performDuckDuckGoSearch.bind(this)
             });
         }
     }
@@ -86,6 +91,8 @@ class MultiSearchService {
 
     /**
      * Perform DuckDuckGo Search (using HTML scraping via instant answer API)
+     * Note: DuckDuckGo doesn't have a public web search API, so we use Instant Answers
+     * For better results, users should configure Google or Bing API
      */
     async performDuckDuckGoSearch(query) {
         try {
@@ -127,14 +134,32 @@ class MultiSearchService {
                 });
             }
 
+            // If no results from Instant Answers, create a search link
+            if (items.length === 0) {
+                items.push({
+                    title: `Search results for "${query}"`,
+                    url: `https://duckduckgo.com/?q=${encodeURIComponent(query)}`,
+                    description: `Click to view search results for "${query}" on DuckDuckGo`,
+                    engine: 'duckduckgo'
+                });
+            }
+
             return {
                 items: items.slice(0, 10),
                 engine: 'duckduckgo'
             };
         } catch (error) {
             console.error('DuckDuckGo Search error:', error.message);
-            // Return empty results instead of throwing
-            return { items: [], engine: 'duckduckgo' };
+            // Return a fallback search link
+            return { 
+                items: [{
+                    title: `Search for "${query}"`,
+                    url: `https://duckduckgo.com/?q=${encodeURIComponent(query)}`,
+                    description: `View search results on DuckDuckGo`,
+                    engine: 'duckduckgo'
+                }], 
+                engine: 'duckduckgo' 
+            };
         }
     }
 
@@ -148,9 +173,12 @@ class MultiSearchService {
             throw new Error('Bing Search API not configured');
         }
 
+        // Use query as-is (already enhanced by deep thinking service)
+        const searchQuery = query;
+
         const url = 'https://api.bing.microsoft.com/v7.0/search';
         const params = {
-            q: query,
+            q: searchQuery,
             count: 10,
             offset: 0,
             mkt: 'en-US',
@@ -167,6 +195,7 @@ class MultiSearchService {
             });
 
             if (!response.data.webPages || !response.data.webPages.value) {
+                console.warn('Bing Search returned no results for query:', searchQuery);
                 return { items: [], engine: 'bing' };
             }
 

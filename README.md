@@ -32,11 +32,11 @@ FaaS is an AI-powered search engine that focuses on providing positive, high-val
 npm install
 ```
 
-### 2. Configure Search Engines (Optional but Recommended)
+### 2. Configure Search Engines (Required for Real Search Results)
 
-The application supports multiple search engines for comprehensive results. You can configure one or more:
+The application supports multiple search engines for comprehensive results. You **must** configure at least one search engine for real-time search results.
 
-#### Google Custom Search API
+#### Google Custom Search API (Recommended)
 
 1. **Get Google API Key**:
    - Go to [Google Cloud Console](https://console.cloud.google.com/)
@@ -52,19 +52,29 @@ The application supports multiple search engines for comprehensive results. You 
    - Click "Create"
    - Copy your Search Engine ID (CX)
 
-3. **Configure the Application**:
-
-   **Option A: Environment Variables (Recommended for Production)**
+3. **Configure in Code** (Recommended):
    
+   Edit `src/config/apiKeys.js` and add your keys:
+   ```javascript
+   export const API_KEYS = {
+       GOOGLE_API_KEY: 'your_google_api_key_here',
+       GOOGLE_SEARCH_ENGINE_ID: 'your_search_engine_id_here',
+       BING_API_KEY: '' // Optional
+   };
+   ```
+
+   **Note**: The `apiKeys.js` file is in `.gitignore` and will not be committed to version control.
+
+   **Alternative Options** (if you prefer not to use the config file):
+   
+   **Option A: Environment Variables**
    Create a `.env` file in the root directory:
    ```env
    VITE_GOOGLE_API_KEY=your_api_key_here
    VITE_GOOGLE_SEARCH_ENGINE_ID=your_search_engine_id_here
    ```
 
-   **Option B: Browser Local Storage (For Development)**
-   
-   The application will work without Google Search API configured, using enhanced simulated responses. To enable Google Search, you can set the API key and Search Engine ID in the browser's developer console:
+   **Option B: Browser Local Storage**
    ```javascript
    localStorage.setItem('google_api_key', 'your_api_key_here');
    localStorage.setItem('google_search_engine_id', 'your_search_engine_id_here');
@@ -79,19 +89,20 @@ For even more comprehensive results, you can also configure Bing Search:
    - Create a new "Bing Search v7" resource
    - Copy your API key
 
-2. **Configure in Application**:
+2. **Configure in Code**:
    
-   **Option A: Environment Variables**
-   ```env
-   VITE_BING_API_KEY=your_bing_api_key_here
-   ```
-   
-   **Option B: Browser Console**
+   Edit `src/config/apiKeys.js` and add your Bing API key:
    ```javascript
-   localStorage.setItem('bing_api_key', 'your_bing_api_key_here');
+   export const API_KEYS = {
+       GOOGLE_API_KEY: 'your_google_api_key_here',
+       GOOGLE_SEARCH_ENGINE_ID: 'your_search_engine_id_here',
+       BING_API_KEY: 'your_bing_api_key_here'
+   };
    ```
 
-**Note**: DuckDuckGo search works automatically without any API key configuration.
+**Configuration Priority**: Code config (`apiKeys.js`) > Environment Variables > LocalStorage
+
+**Note**: Without API keys configured, the application will use a fallback mode with general Africa-focused information, but won't have real-time search results.
 
 ### 3. Run the Application
 
