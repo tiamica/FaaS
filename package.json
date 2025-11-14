@@ -2,16 +2,29 @@
   "name": "fourier-analytics-ai-search",
   "version": "1.0.0",
   "description": "The most intelligent search engine for Africa",
-  "main": "src/app.js",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "vite"
   },
   "dependencies": {
-    "axios": "^1.6.0"
+    "axios": "^1.13.2"
   },
   "devDependencies": {
     "vite": "^7.2.2"
-  }
+  },
+  "main": "vite.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tiamica/FaaS.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tiamica/FaaS/issues"
+  },
+  "homepage": "https://github.com/tiamica/FaaS#readme"
 }

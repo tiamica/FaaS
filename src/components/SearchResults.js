@@ -26,9 +26,33 @@ export class SearchResults {
     }
 
     displayResults(data) {
-        this.displayAIResponse(data.answer);
-        this.displayRelatedCountries(data.relatedCountries);
-        this.displaySources(data.sources);
+        if (!data) {
+            this.showError('No results returned. Please try again.');
+            return;
+        }
+        
+        // Display AI response
+        if (data.answer) {
+            this.displayAIResponse(data.answer);
+        } else {
+            this.displayAIResponse('No response generated. Please try a different search query.');
+        }
+        
+        // Display related countries
+        if (data.relatedCountries && Array.isArray(data.relatedCountries) && data.relatedCountries.length > 0) {
+            this.displayRelatedCountries(data.relatedCountries);
+        } else {
+            this.element.querySelector('.countries-grid').innerHTML = 
+                '<p style="color: var(--text-light); text-align: center; padding: 2rem;">No specific countries identified for this search.</p>';
+        }
+        
+        // Display sources
+        if (data.sources && Array.isArray(data.sources) && data.sources.length > 0) {
+            this.displaySources(data.sources);
+        } else {
+            this.element.querySelector('.sources-list').innerHTML = 
+                '<p style="color: var(--text-light); text-align: center; padding: 1rem;">No additional sources available.</p>';
+        }
     }
 
     displayAIResponse(response) {

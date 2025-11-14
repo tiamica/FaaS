@@ -1,0 +1,20 @@
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+  root: '.',
+  publicDir: 'public',
+  server: {
+    port: 5173,
+    host: true,
+    open: true // Automatically open browser
+  },
+  build: {
+    outDir: 'dist',
+    sourcemap: true,
+    rollupOptions: {
+      input: {
+        main: './public/index.html'
+      }
+    }
+  }
+});
